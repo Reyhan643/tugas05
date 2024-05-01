@@ -1,0 +1,159 @@
+import java.util.Scanner; // Mengimpor kelas Scanner dari paket java.util
+
+public class PesanTiketApp {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in); // Membaca inputan dari user
+
+        System.out.println("Selamat datang di program pemesanan tiket!");
+
+        // Meminta nama pembeli
+        System.out.print("Masukkan nama pembeli: ");
+        String namaPembeli = scanner.nextLine(); // Membaca masukan nama pembeli
+
+        // Memilih tahap pembelian
+        System.out.println("\nPilih tahap pembelian :");
+        System.out.println("1. Presale");
+        System.out.println("2. Reguler");
+        System.out.print("Pilih tahap pembelian (1/2): ");
+        int tahapPembelian = scanner.nextInt(); // Membaca masukan tahap pembelian
+
+        // Memilih jenis tiket
+        Tiket tiket = null; // Pendefinisian variabel tanpa inisialisasi objek
+        if (tahapPembelian == 1) {
+            // Presale
+            System.out.println("\nPilih jenis tiket:");
+            System.out.println("1. VIP");
+            System.out.println("2. VVIP");
+            System.out.print("Pilih jenis tiket (1/2): ");
+            int jenisTiket = scanner.nextInt(); // Masukan jenis tiket
+            if (jenisTiket == 1) {
+                tiket = new VIP();
+            } else if (jenisTiket == 2) {
+                tiket = new VVIP();
+            } else {
+                System.out.println("Input tidak valid!");
+                return;
+            }
+        } else if (tahapPembelian == 2) {
+            // Reguler
+            System.out.println("\nPilih jenis tiket:");
+            System.out.println("1. Festival");
+            System.out.println("2. VIP");
+            System.out.println("3. VVIP");
+            System.out.print("Pilih jenis tiket (1/2/3): ");
+            int jenisTiket = scanner.nextInt(); // Masukan jenis tiket
+            if (jenisTiket == 1) {
+                tiket = new Festival();
+            } else if (jenisTiket == 2) {
+                tiket = new VIP();
+            } else if (jenisTiket == 3) {
+                tiket = new VVIP();
+            } else {
+                System.out.println("Input tidak valid!");
+                return;
+            }
+        } else {
+            System.out.println("Input tidak valid!"); // Menampilkan pesan kesalahan jika user tidak memasukkan inputan yang benar
+            return;
+        }
+
+        // Memasukkan jumlah tiket
+        System.out.print("Masukkan jumlah tiket yang ingin dibeli: ");
+        int jumlahTiket = scanner.nextInt(); // Masukan jumlah tiket
+
+        // Membuat objek pemesanan
+        Pemesanan pemesanan = new Pemesanan(namaPembeli, tahapPembelian == 1 ? "Presale" : "Reguler", tiket,
+                jumlahTiket);
+
+        // Cetak nota pemesanan
+        pemesanan.cetakNota();
+    }
+}
+
+// Kelas yang menyimpan informasi pemesanan tiket
+class Pemesanan {
+    private String nama;
+    private String tahap;
+    private Tiket tiket;
+    private int jumlah;
+
+    public Pemesanan(String nama, String tahap, Tiket tiket, int jumlah) { // Konstruktor dari class pemesanan
+        this.nama = nama;
+        this.tahap = tahap;
+        this.tiket = tiket;
+        this.jumlah = jumlah;
+    }
+
+    public void cetakNota() { // Method untuk mencetak nota hasil akhir
+        boolean isPresale = this.tahap.equalsIgnoreCase("Presale"); // Menggunakan this untuk variabel kelas
+        double totalHarga = this.tiket.hitungHarga(this.jumlah, isPresale); // Menggunakan this untuk variabel kelas
+        System.out.println("\n- - - Nota Pemesanan - - -");
+        System.out.println("Nama Pembeli: " + this.nama); // Menggunakan this untuk variabel kelas
+        System.out.println("Tahap Pembelian: " + this.tahap); // Menggunakan this untuk variabel kelas
+        System.out.println("Jenis Tiket: " + this.tiket.getJenis()); // Menggunakan this untuk variabel kelas
+        System.out.println("Jumlah Tiket: " + this.jumlah); // Menggunakan this untuk variabel kelas
+        System.out.println("Total Harga: Rp " + totalHarga);
+    }
+}
+
+// Kelas abstrak untuk semua jenis tiket
+abstract class Tiket {
+    protected String jenis;
+    protected double harga;
+
+    public Tiket(String jenis, double harga) { // Konstruktor
+        this.jenis = jenis;
+        this.harga = harga;
+    }
+
+    public String getJenis() {
+        return jenis;
+    }
+
+    public double getHarga() {
+        return harga;
+    }
+
+    public abstract double hitungHarga(int jumlah, boolean isPresale); // Deklarasi metode abstrak
+}
+
+// Kelas turunan untuk tiket Festival
+class Festival extends Tiket {
+    public Festival() {
+        super("Festival", 100);
+    }
+
+    public double hitungHarga(int jumlah, boolean isPresale) { // Method untuk mengalikan harga dengan jumlah
+        return harga * jumlah;
+    }
+}
+
+// Kelas turunan untuk tiket VIP
+class VIP extends Tiket {
+    public VIP() {
+        super("VIP", 150); // Pemanggilan konstruktor dari kelas yang diwarisi (superclass)
+    }
+
+    public double hitungHarga(int jumlah, boolean isPresale) { // Method untuk mengalikan harga dengan jumlah
+        if (isPresale) {
+            return (harga * jumlah) * 0.8; // Diskon 20% untuk presale
+        } else {
+            return harga * jumlah;
+        }
+    }
+}
+
+// Kelas turunan untuk tiket VVIP
+class VVIP extends Tiket {
+    public VVIP() {
+        super("VVIP", 200); // Pemanggilan konstruktor dari kelas yang diwarisi (superclass)
+    }
+
+    public double hitungHarga(int jumlah, boolean isPresale) { // Method untuk mengalikan harga dengan jumlah
+        if (isPresale) {
+            return (harga * jumlah) * 0.8; // Diskon 20% untuk presale
+        } else {
+            return harga * jumlah;
+        }
+    }
+}
